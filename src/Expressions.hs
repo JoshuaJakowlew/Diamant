@@ -1,5 +1,5 @@
 {-# LANGUAGE TupleSections #-}
-module Expressions ( Expr
+module Expressions ( Expr (..)
                    , tokenize
                    ) where
 
@@ -15,7 +15,7 @@ import qualified Text.Parsec.Expr as E
 
 -- import qualified Test.HUnit as H
 
-import Debug.Trace (trace)
+-- import Debug.Trace (trace)
 
 type Operator = E.Operator String () Identity Expr
 
@@ -26,6 +26,10 @@ data Expr = StringLit       String         -- String literal
           | Var             String         -- Variable name
 
           | Parens          Expr           -- Expression in parens
+
+          | VarDecl         String         -- Variable name
+
+          | RetStatement    Expr           -- Return statement
 
           | FuncApp         String         -- Function name
                             [Expr]         -- Parameter list
@@ -44,6 +48,7 @@ data Expr = StringLit       String         -- String literal
 
           | WhileStatement  Expr           -- While statement condition
                             [Expr]         -- While statement body
+           
           deriving (Eq, Show)
 
 tokenize :: String -> Either ParseError Expr
@@ -57,6 +62,8 @@ term =  try (moduleDef expr)
     <|> try (funcDef expr)
     <|> ifElseStatement expr
     <|> whileStatement expr
+    <|> retStatement expr
+    <|> try (varDecl expr)
     <|> try (funcApp expr)
     <|> numLit
     <|> stringLit
@@ -172,3 +179,15 @@ whileStatement :: Parser Expr -> Parser Expr
 whileStatement val =  keyword "while"
                    *> (WhileStatement <$> parens val             -- while statement condition
                                       <*> parens (commaSep val)) -- while statement body
+
+retStatement :: Parser Expr -> Parser Expr
+retStatement val = do
+    void $ keyword "ret"
+    e <- val
+    return $ RetStatement e
+
+varDecl :: Parser Expr -> Parser Expr
+varDecl val = do
+    void $ keyword "let"
+    name <- iden
+    return $ VarDecl name

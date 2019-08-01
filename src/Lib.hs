@@ -1,2 +1,6 @@
-module Lib where
+module Lib ( module Translator
+           , module Expressions
+           ) where
 
+import Translator
+import Expressions

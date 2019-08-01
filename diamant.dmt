@@ -1,0 +1,20 @@
+module Test ()
+(
+    fn fact(n)
+    (
+        let i = 1,
+        let result = 1,
+        while (i < n || i == n)
+        (
+            result = result * i,
+            i = i + 1
+        ),
+        ret result
+    ),
+
+    fn foo()
+    (
+        let f = fact(10),
+        ret f
+    )
+)
