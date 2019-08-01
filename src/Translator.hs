@@ -11,9 +11,8 @@ translate (Left _) = Nothing
 translate (Right e) = Just $ between cppStartCode cppEndCode (toCpp e)
 
 cppStartCode :: String
-cppStartCode = unlines [ "#include <iostream>"
-                       , "#include <map>"
-                       , "#include <string>"
+cppStartCode = unlines [ "#include <string>"
+                       , "using std::string_literals;"
                        , "auto main() -> int"
                        , "{"]
 
